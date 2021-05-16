@@ -50,7 +50,6 @@ public class ChatServerMessageParser {
             messageText = splits[3];
 
 
-
         result.setSource(source);
         result.setTarget(target);
         result.setMessageText(messageText);
@@ -59,8 +58,6 @@ public class ChatServerMessageParser {
 
         if(identifier.equalsIgnoreCase("privmsg")){
             result.setMessageType(ChatServerMessageType.CHAT_MESSAGE);
-            if(messageText.startsWith(":"))
-                result.setMessageText(messageText.substring(1));
             return result;
         }
 

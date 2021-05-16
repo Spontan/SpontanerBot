@@ -45,6 +45,6 @@ public class SimpleResponseModule implements Module{
         logger.info("onChatMessage");
         String response = messageToResponse.get(e.getText());
         if(response != null && e.getChannel() != null)
-            twitchConnection.sendChatMessage(e.getChannel(), response);
+            twitchConnection.sendChatMessage(e.getChannel(), "@" + e.getUser().getName() +" " + response);
     }
 }

@@ -7,6 +7,7 @@ import twitch.TwitchConnection;
 import twitch.TwitchConnectionImpl;
 import twitch.chat.ChatConnectionFactory;
 import twitch.chat.ChatConnection;
+import twitch.chat.ChatTestInterface;
 import twitch.chat.IrcChatConnection;
 
 import java.io.IOException;

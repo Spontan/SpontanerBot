@@ -98,7 +98,7 @@ public class IrcChatConnection extends AbstractChatConnection {
         }
     }
 
-    private void doSendMessage(String message) throws IOException{
+    private synchronized void doSendMessage(String message) throws IOException{
         logger.info(">> " + message);
         outputWriter.write(message + "\r\n");
         outputWriter.flush();

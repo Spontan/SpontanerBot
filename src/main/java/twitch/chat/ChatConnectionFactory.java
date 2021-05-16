@@ -53,14 +53,8 @@ public class ChatConnectionFactory {
             @Override
             public void handle(ChatServerMessage message) {
                 if(message.getMessageType() == ChatServerMessageType.CHAT_MESSAGE) {
-                    ChatMessageTo chatMessage = new ChatMessageTo();
-                    ChannelTo channel = new ChannelTo();
-                    channel.setName("spontanicus");
-                    chatMessage.setChannel(channel);
-                    chatMessage.setMessage(message.getMessageText());
-                    chatConnection.informChatMessageHandlers(chatMessage);
+                    chatConnection.informChatMessageHandlers(message.extractChatMessage());
                 }
-
             }
         });
 
