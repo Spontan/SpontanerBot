@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import twitch.chat.messages.ChatServerMessage;
 import twitch.chat.messages.ChatServerMessageType;
-import twitch.chat.messages.handlers.ChatServerMessageHandler;
 
 import java.io.IOException;
 
@@ -34,22 +33,13 @@ public class IrcChatConnectionTest {
     synchronized public void connectToServerSuccess() throws InterruptedException, IOException {
         //given
         responseReceived = false;
-        ircChatConnection.registerServerMessageHandler(new ChatServerMessageHandler(ChatServerMessageType.UNKNOWN) {
-            @Override
-            public void handle(ChatServerMessage message) {
-                received();
-            }
-        });
 
         //when
         ircChatConnection.connect();
         wait(1000);
 
         //then
-        assert(responseReceived);
-    }
-
-    private void received(){
-        responseReceived=true;
+        assert(ircChatConnection.isMessageInQueue());
+        assert(ircChatConnection.popServerMessage() != null);
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * TODO: rework into TO structure (think about if that is actually best way to model)
  */
-public class ChannelTo {
+public class ChannelTo implements MessagingChannel {
     private User owner;
     private List<User> allUsers; // might have discard this and use db calls later if list too long
     private List<User> currentViewers;
@@ -31,5 +31,10 @@ public class ChannelTo {
 
     public void setName(String name){
         this.name = name;
+    }
+
+    @Override
+    public String getTargetAddress() {
+        return "#" + name;
     }
 }

@@ -2,8 +2,10 @@ package twitch.chat.messages;
 
 public enum ChatServerMessageType{
     PING,
-    RESPONSE,
+    PONG,
+    JOIN,
+    LEAVE,
     CHAT_MESSAGE,
-    UNKNOWN,
-    ANY
+    ERROR,
+    OTHER
 }

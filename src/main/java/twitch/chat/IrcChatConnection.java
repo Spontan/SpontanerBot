@@ -3,15 +3,17 @@ package twitch.chat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitch.ChannelTo;
-import twitch.chat.messages.ChatMessageTo;
 import twitch.chat.messages.ChatServerMessage;
 import twitch.chat.messages.ChatServerMessageParser;
+import twitch.chat.messages.ChatServerMessageType;
 import twitch.chat.messages.handlers.ChatMessageHandler;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class IrcChatConnection extends AbstractChatConnection {
     private static final Logger logger = LoggerFactory.getLogger(IrcChatConnection.class);
@@ -24,6 +26,8 @@ public class IrcChatConnection extends AbstractChatConnection {
     private BufferedReader inputReader;
     private Thread readerThread;
 
+    private Queue<ChatServerMessage> serverMessageQueue;
+
     private List<ChatMessageHandler> chatMessageHandlers;
 
 
@@ -32,6 +36,7 @@ public class IrcChatConnection extends AbstractChatConnection {
         this.serverPort = serverPort;
         this.joinedChannels = new ArrayList<>();
         this.chatMessageHandlers = new ArrayList<>();
+        this.serverMessageQueue = new LinkedList<>();
     }
 
     private void setupConnection() throws IOException {
@@ -76,8 +81,14 @@ public class IrcChatConnection extends AbstractChatConnection {
                 return false;
 
             ChatServerMessage message = ChatServerMessageParser.parseServerMessage(line);
-            //logger.debug(message.toString());
-            informMessageHandlers(message);
+            if(message.getMessageType() == ChatServerMessageType.PONG)
+                return true;
+            if(message.getMessageType() == ChatServerMessageType.PING){
+                sendPong();
+                return true;
+            }
+            putServerMessage(message);
+
         } catch (IOException e){
             logger.error("Something went wrong when trying to receive message from IRC server");
             e.printStackTrace();
@@ -134,19 +145,26 @@ public class IrcChatConnection extends AbstractChatConnection {
     }
 
     @Override
-    public void sendChatMessage(ChannelTo channel, String message) {
-        sendServerMessage("PRIVMSG #" + channel.getName().toLowerCase() + " :" + message);
+    public void sendChatMessage(String target, String message) {
+        sendServerMessage("PRIVMSG " + target.toLowerCase() + " :" + message);
     }
 
     @Override
-    public void registerChatMessageHandler(ChatMessageHandler handler) {
-        chatMessageHandlers.add(handler);
+    public boolean isMessageInQueue() {
+        return !serverMessageQueue.isEmpty();
     }
 
     @Override
-    public void informChatMessageHandlers(ChatMessageTo message) {
-         chatMessageHandlers.forEach(handler -> handler.handle(message));
+    public ChatServerMessage popServerMessage() {
+        return serverMessageQueue.poll();
     }
 
-    //TODO: deregister Handlers
+    @Override
+    public ChatServerMessage peekServerMessage() {
+        return serverMessageQueue.peek();
+    }
+
+    private void putServerMessage(ChatServerMessage message){
+        serverMessageQueue.add(message);
+    }
 }

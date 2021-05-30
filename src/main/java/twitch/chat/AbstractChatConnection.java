@@ -4,9 +4,6 @@ import configuration.StartConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitch.*;
-import twitch.chat.messages.ChatServerMessage;
-import twitch.chat.messages.ChatServerMessageType;
-import twitch.chat.messages.handlers.ChatServerMessageHandler;
 
 import java.io.IOException;
 import java.nio.channels.NotYetConnectedException;
@@ -22,9 +19,6 @@ public abstract class AbstractChatConnection implements ChatConnection {
     protected String password;
     protected String nickName;
 
-
-    private ChatServerMessageHandlerMap messageHandlers = new ChatServerMessageHandlerMap();
-
     public static ChatConnection getInstance(StartConfiguration config){
         if(instance == null)
             instance = ChatConnectionFactory.getChatConnection(config);
@@ -38,8 +32,7 @@ public abstract class AbstractChatConnection implements ChatConnection {
         sendServerMessage("ping");
     }
 
-    @Override
-    public void sendPong(){
+    protected void sendPong(){
         sendServerMessage("pong");
     }
 
@@ -77,17 +70,5 @@ public abstract class AbstractChatConnection implements ChatConnection {
         if(isConnected())
             throw new IllegalStateException("Cannot change password while connection is open");
         this.nickName = nickName;
-    }
-
-    @Override
-    public void registerServerMessageHandler(ChatServerMessageHandler handler){
-        messageHandlers.put(handler);
-    }
-
-    protected void informMessageHandlers(ChatServerMessage message){
-        ChatServerMessageType messageType = message.getMessageType();
-        List<ChatServerMessageHandler> handlersForMessage = messageHandlers.getHandlerForMessageType(messageType);
-
-        handlersForMessage.forEach(handler -> handler.handle(message));
     }
 }

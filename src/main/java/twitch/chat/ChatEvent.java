@@ -1,16 +1,16 @@
 package twitch.chat;
 
-import twitch.ChannelTo;
+import twitch.MessagingChannel;
 import twitch.TwitchEvent;
 
 public class ChatEvent implements TwitchEvent {
-    private ChannelTo channel;
+    private MessagingChannel channel;
 
-    public ChatEvent(ChannelTo channel){
+    public ChatEvent(MessagingChannel channel){
         this.channel = channel;
     }
 
-    public ChannelTo getChannel(){
+    public MessagingChannel getChannel(){
         return channel;
     }
 }

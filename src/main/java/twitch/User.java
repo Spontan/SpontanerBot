@@ -1,6 +1,6 @@
 package twitch;
 
-public class User {
+public class User implements MessagingChannel {
 
     private String name;
 
@@ -16,5 +16,11 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    @Override
+    public String getTargetAddress() {
+        return name;
     }
 }

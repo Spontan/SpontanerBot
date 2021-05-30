@@ -14,5 +14,5 @@ public interface TwitchConnection {
 
     void deregisterListeningModule(Module module);
 
-    void sendChatMessage(ChannelTo channel, String message);
+    void sendChatMessage(MessagingChannel channel, String message);
 }

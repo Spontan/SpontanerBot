@@ -4,11 +4,6 @@ import configuration.StartConfiguration;
 import configuration.StartConfiguration.StartConfigurationParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import twitch.ChannelTo;
-import twitch.chat.messages.ChatMessageTo;
-import twitch.chat.messages.ChatServerMessage;
-import twitch.chat.messages.ChatServerMessageType;
-import twitch.chat.messages.handlers.ChatServerMessageHandler;
 
 
 public class ChatConnectionFactory {
@@ -35,30 +30,8 @@ public class ChatConnectionFactory {
 
         chatConnection.setPassword(token);
         chatConnection.setNickName(nick);
-        registerHandlers(chatConnection);
 
         return chatConnection;
-    }
-
-    private static void registerHandlers(ChatConnection chatConnection) {
-        chatConnection.registerServerMessageHandler(new ChatServerMessageHandler(ChatServerMessageType.PING) {
-            @Override
-            public void handle(ChatServerMessage message) {
-                if(message.getMessageType() == ChatServerMessageType.PING)
-                    chatConnection.sendPong();
-
-            }
-        });
-        chatConnection.registerServerMessageHandler(new ChatServerMessageHandler(ChatServerMessageType.CHAT_MESSAGE) {
-            @Override
-            public void handle(ChatServerMessage message) {
-                if(message.getMessageType() == ChatServerMessageType.CHAT_MESSAGE) {
-                    chatConnection.informChatMessageHandlers(message.extractChatMessage());
-                }
-            }
-        });
-
-
     }
 
     //TODO: think if i'll need it later, otherwise remove

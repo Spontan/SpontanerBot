@@ -1,9 +1,8 @@
 package twitch.chat.messages;
 
 import twitch.ChannelTo;
+import twitch.MessagingChannel;
 import twitch.User;
-
-import java.util.regex.Pattern;
 
 /**
  * Contains parsed information on received messages from the chat server.
@@ -14,7 +13,7 @@ public class ChatServerMessage{
 
     private ChatServerMessageType messageType;
     private String source;
-    private ChatMessageTo chatMessage;
+    private ChatMessage chatMessage;
     private int responseCode;
     private String target;
     private String messageText;
@@ -25,7 +24,7 @@ public class ChatServerMessage{
     }
 
 
-    public ChatMessageTo getChatMessage() {
+    public ChatMessage getChatMessage() {
         return chatMessage;
     }
 
@@ -33,53 +32,54 @@ public class ChatServerMessage{
         this.messageType = messageType;
     }
 
-    public void setChatMessage(ChatMessageTo chatMessage) {
+    public void setChatMessage(ChatMessage chatMessage) {
         this.chatMessage = chatMessage;
     }
 
-    public ChatMessageTo extractChatMessage(){
+    public ChatMessage extractChatMessage(){
         if(messageType != ChatServerMessageType.CHAT_MESSAGE)
             throw new IllegalArgumentException("This server message does not contain a chat message");
         if(source == null)
             throw new IllegalArgumentException("No source was provided for this chat message");
 
-        ChatMessageTo result = new ChatMessageTo();
+        ChatMessage result = new ChatMessage();
 
         if(target == null)
             target = "";
         if(messageText == null)
             messageText = "";
 
-        result.setUser(extractSender());
+        result.setSender(extractSender());
         result.setMessage(messageText.substring(1));
-        result.setChannel(extractTarget());
+        MessagingChannel messageTarget = extractTarget();
+
+        if(messageTarget instanceof User)
+            result.setPrivateMessage(true);
+        result.setTarget(messageTarget);
+
+
 
         return result;
     }
 
     private User extractSender(){
         // possible patterns: :username!username@username.serveraddress, :username.serveraddress, :serveraddress
-        String source = this.source;
+        String sender = this.source;
 
-        source = source.split("!")[0];  //:username, :username.serveraddress, :serveraddress
-        source = source.split("." + serverAddress)[0]; //:username, :serveraddress
-        source = source.substring(1);
+        sender = sender.split("!")[0];  //:username, :username.serveraddress, :serveraddress
+        sender = sender.split("." + serverAddress)[0]; //:username, :serveraddress
+        sender = sender.substring(1);
 
-        User user = new User(source);
-
-        return user;
+        return new User(sender);
     }
 
-    private ChannelTo extractTarget(){
-        String target = this.target;
-        ChannelTo result = new ChannelTo();
-
+    private MessagingChannel extractTarget(){
         if(target.startsWith("#")){
-            result.setName(target.substring(1));
-            return result;
-        }else{
-            throw new UnsupportedOperationException("Private messages are not yet implemented");
+            ChannelTo channel = new ChannelTo();
+            channel.setName(target.substring(1));
+            return channel;
         }
+        return new User(target);
     }
 
     public int getResponseCode() {

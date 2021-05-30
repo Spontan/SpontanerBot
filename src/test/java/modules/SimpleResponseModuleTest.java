@@ -4,12 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 import twitch.ChannelTo;
 import twitch.TwitchConnection;
-import twitch.chat.messages.ChatMessageTo;
+import twitch.chat.messages.ChatMessage;
 import twitch.chat.messages.ChatMessageEvent;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verify;
 
 public class SimpleResponseModuleTest {
@@ -72,10 +71,10 @@ public class SimpleResponseModuleTest {
         verifyNoInteractions(twitchConnection);
     }
 
-    private ChatMessageTo makeChatMessage(String message){
-        ChatMessageTo chatMessage = new ChatMessageTo();
+    private ChatMessage makeChatMessage(String message){
+        ChatMessage chatMessage = new ChatMessage();
         chatMessage.setMessage(message);
-        chatMessage.setChannel(channel);
+        chatMessage.setTarget(channel);
 
         return chatMessage;
     }
